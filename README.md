@@ -2,11 +2,6 @@
 
 Converts Youtube Videos to MP3 to be added to Spotify
 
-# Project Structure
-
-```text
-yt2spotify/ ├── README.md ├── requirements.txt ├── .env ├── main.py ├── tests/ └── .gitignore
-
 # Getting started
 
 # Download FFMPEG
@@ -31,4 +26,3 @@ Create a text file and paste in the Youtube video URLs you want to be converted 
 The expected format is one URL per line separated by a newline.
 Name the file 'youtube_urls.txt', just be sure to update the file_path variable in main.py if you do change it.
 Running the script will take the URLs, convert the videos to MP3, and create a folder in your project directory called "mp3_downloads" to store the MP3 files under.
-```
