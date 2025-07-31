@@ -1,9 +1,11 @@
-file_path = 'youtube_urls.txt'
+from utils import download_mp3
 
+file_path = "youtube_urls.txt"
 try:
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
-            print(line.strip())
+            download_mp3(line)
+
 except FileNotFoundError:
     print(f"File not found: {file_path}")
 except Exception as e:
