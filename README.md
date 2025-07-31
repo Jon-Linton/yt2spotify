@@ -4,13 +4,7 @@ Converts Youtube Videos to MP3 to be added to Spotify
 
 # Project Structure
 
-yt2spotify/
-├── README.md
-├── requirements.txt
-├── .env
-├── main.py
-├── tests/
-└── .gitignore
+<pre><code>```text yt2spotify/ ├── README.md ├── requirements.txt ├── .env ├── main.py ├── tests/ └── .gitignore ```</code></pre>
 
 # Getting started
 
