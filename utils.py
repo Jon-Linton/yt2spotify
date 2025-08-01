@@ -6,7 +6,7 @@ from PIL import Image
 import os
 
 
-def download_mp3(youtube_url, output_dir="./mp3_downloads"):
+def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads"):
 
     # Create directory and set ffmpeg path
     os.makedirs(output_dir, exist_ok=True)
@@ -97,3 +97,11 @@ def download_mp3(youtube_url, output_dir="./mp3_downloads"):
     # Optional: Clean up
     os.remove(thumb_path)
     os.remove(jpg_path)
+
+
+def delete_files_with_substring(directory, substring):
+    for filename in os.listdir(directory):
+        if substring not in filename:
+            file_path = os.path.join(directory, filename)
+            os.remove(file_path)
+            print("File deleted:", filename)
