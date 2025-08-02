@@ -100,8 +100,16 @@ def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads"):
 
 
 def delete_files_with_substring(directory, substring):
+    delete_status_msg = "Files deleted: "
+    names_of_deleted_files = ""
     for filename in os.listdir(directory):
         if substring not in filename:
             file_path = os.path.join(directory, filename)
             os.remove(file_path)
+            names_of_deleted_files += "{filename}, "
             print("File deleted:", filename)
+
+    if len(names_of_deleted_files) < 1:
+        delete_status_msg = "No files found to delete"
+
+    return delete_status_msg
