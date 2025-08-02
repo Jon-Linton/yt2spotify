@@ -1,9 +1,14 @@
 from utils import convert_yt_to_mp3, delete_files_with_substring
+from dotenv import load_dotenv
+import os
 
-yt_url_file = "./io_files/youtube_urls.txt"
-past_downloads_file = "./io_files/past_downloads.txt"
-target_directory = "./mp3_downloads"  # Replace with your directory path
-search_string = "_final"
+# Load environment variables from .env file
+load_dotenv()
+yt_url_file = os.getenv("YT_URL_INPUT_FILE")
+past_downloads_file = os.getenv("YT_URL_OUTPUT_FILE")
+clean_target_dir = os.getenv("MP3_CLEAN_TARGET_DIR")
+file_str_to_skip_del = os.getenv("CLEAN_SEARCH_STR")
+
 try:
     with open(yt_url_file, "r") as file:
         lines = file.readlines()
@@ -20,10 +25,12 @@ try:
         file.write("")
 
     # Cleans up non-final mp3 files (the ones without the jpeg cover art)
-    target_directory = "./mp3_downloads"  # Replace with your directory path
-    search_string = "_final"
+    mp3_clean_target_dir = "./mp3_downloads"  # Replace with your directory path
+    file_str_to_skip_del = "_final"
     print("Searching for mp3 files to clean up...")
-    delete_status_msg = delete_files_with_substring(target_directory, search_string)
+    delete_status_msg = delete_files_with_substring(
+        mp3_clean_target_dir, file_str_to_skip_del
+    )
     print(delete_status_msg or "No delete status available")
 
 
