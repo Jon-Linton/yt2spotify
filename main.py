@@ -22,14 +22,9 @@ try:
     # Cleans up non-final mp3 files (the ones without the jpeg cover art)
     target_directory = "./mp3_downloads"  # Replace with your directory path
     search_string = "_final"
-    try:
-        print("Searching for mp3 files to clean up...")
-        delete_status_msg = delete_files_with_substring(target_directory, search_string)
-        print(delete_status_msg or "No delete status available")
-    except FileNotFoundError:
-        print(f"Error: directory '{target_directory}' not found.")
-    except OSError as e:
-        print(f"Error deleting file '{target_directory}': {e}")
+    print("Searching for mp3 files to clean up...")
+    delete_status_msg = delete_files_with_substring(target_directory, search_string)
+    print(delete_status_msg or "No delete status available")
 
 
 except FileNotFoundError:
