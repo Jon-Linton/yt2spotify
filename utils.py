@@ -6,13 +6,55 @@ from PIL import Image
 import os
 
 
-def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads"):
+def _require_ffmpeg():
+    """Locate ffmpeg/ffprobe or raise a clear, early error instead of letting
+    yt-dlp fail later with a vague 'not found' message.
 
-    # Create directory and set ffmpeg path
+    Resolution order:
+    1. shutil.which() — works if this process's PATH includes ffmpeg
+    2. FFMPEG_PATH env var (e.g. set in .env) — explicit override/fallback
+    """
+    ffmpeg_path = shutil.which("ffmpeg")
+    ffprobe_path = shutil.which("ffprobe")
+
+    if not ffmpeg_path or not ffprobe_path:
+        env_path = os.getenv(
+            "FFMPEG_PATH"
+        )  # accepts either a bin dir or the ffmpeg binary itself
+        if env_path:
+            exe_name = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+            probe_name = "ffprobe.exe" if os.name == "nt" else "ffprobe"
+
+            if os.path.isdir(env_path):
+                candidate_ffmpeg = os.path.join(env_path, exe_name)
+                candidate_dir = env_path
+            else:
+                candidate_ffmpeg = env_path
+                candidate_dir = os.path.dirname(env_path)
+
+            candidate_probe = os.path.join(candidate_dir, probe_name)
+
+            if os.path.isfile(candidate_ffmpeg) and os.path.isfile(candidate_probe):
+                return candidate_ffmpeg, candidate_dir
+
+        raise RuntimeError(
+            "ffmpeg and/or ffprobe not found on PATH for this Python process, "
+            f"and FFMPEG_PATH ({env_path!r}) did not resolve to a valid ffmpeg "
+            "+ ffprobe pair. Set FFMPEG_PATH to either the bin directory "
+            "containing both binaries, or the full path to the ffmpeg binary."
+        )
+
+    return ffmpeg_path, os.path.dirname(ffmpeg_path)
+
+
+def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads", ffmpeg_path=None):
+
     os.makedirs(output_dir, exist_ok=True)
 
-    ffmpeg_path = shutil.which("ffmpeg")
-    ffmpeg_dir = os.path.dirname(ffmpeg_path) if ffmpeg_path else None
+    if ffmpeg_path:
+        ffmpeg_dir = os.path.dirname(ffmpeg_path)
+    else:
+        ffmpeg_path, ffmpeg_dir = _require_ffmpeg()
 
     ydl_opts = {
         "format": "bestaudio/best",
@@ -56,9 +98,9 @@ def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads"):
     mp3_path = mp3_files[0]
     thumb_path = thumb_files[0]
     jpg_path = thumb_path.rsplit(".", 1)[0] + ".jpg"
-    final_path = mp3_path.replace(".mp3", "_final.mp3")
+    final_path = mp3_path.rsplit(".", 1)[0] + "_final.mp3"
 
-    # Step 3: Convert thumbnail to JPEG
+    # Convert thumbnail to JPEG
     try:
         with Image.open(thumb_path) as im:
             rgb = im.convert("RGB")
@@ -94,22 +136,21 @@ def convert_yt_to_mp3(youtube_url, output_dir="./mp3_downloads"):
     )
     print(f"Embedded JPEG into: {final_path}")
 
-    # Optional: Clean up
+    # Clean up intermediate files
     os.remove(thumb_path)
     os.remove(jpg_path)
 
 
 def delete_files_with_substring(directory, substring):
-    delete_status_msg = "Files deleted: "
-    names_of_deleted_files = ""
+    deleted_filenames = []
     for filename in os.listdir(directory):
         if substring not in filename:
             file_path = os.path.join(directory, filename)
             os.remove(file_path)
-            names_of_deleted_files += "{filename}, "
+            deleted_filenames.append(filename)
             print("File deleted:", filename)
 
-    if len(names_of_deleted_files) < 1:
-        delete_status_msg = "No files found to delete"
+    if not deleted_filenames:
+        return "No files found to delete"
 
-    return delete_status_msg
+    return "Files deleted: " + ", ".join(deleted_filenames)
